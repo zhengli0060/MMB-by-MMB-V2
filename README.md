@@ -42,7 +42,7 @@ Note: standard-library modules such as `logging`, `typing`, `itertools`, `time`,
 Let $\mathrm{PAG}$ and $\widehat{\mathrm{PAG}}$ denote the true PAG and the learned PAG. The function `local_mark_evaluation` evaluates the local structure around a target variable $T$ by comparing the target row and target column of the two PAG matrices, excluding the diagonal entry $(T,T)$. Formally, it considers
 
 $$
-\Omega_T = \{(T,V) : V \in \mathbf{O} \setminus \{T\}\} \cup \{(V,T) : V \in \mathbf{O} \setminus \{T\}\},
+\Omega_T = \left[(T,V) : V \in \mathbf{O} \setminus \{T\}\right] \cup \left[(V,T) : V \in \mathbf{O} \setminus \{T\}\right],
 $$
 
 where $\mathbf{O}$ is the set of observed variables. In other words, $\Omega_T$ contains all matrix entries corresponding to endpoint marks of edges incident to $T$.
