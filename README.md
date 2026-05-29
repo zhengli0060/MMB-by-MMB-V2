@@ -42,11 +42,7 @@ Note: standard-library modules such as `logging`, `typing`, `itertools`, `time`,
 Let $\mathrm{PAG}$ and $\widehat{\mathrm{PAG}}$ denote the true PAG and the learned PAG. The function `local_mark_evaluation` evaluates the local structure around a target variable $T$ by comparing the target row and target column of the two PAG matrices, excluding the diagonal entry $(T,T)$. Formally, it considers
 
 $$
-\Omega_T
-=
-\{(T,V):V\in \mathbf{O}\setminus\{T\}\}
-\cup
-\{(V,T):V\in \mathbf{O}\setminus\{T\}\},
+\Omega_T = \{(T,V) : V \in \mathbf{O} \setminus \{T\}\} \cup \{(V,T) : V \in \mathbf{O} \setminus \{T\}\},
 $$
 
 where $\mathbf{O}$ is the set of observed variables. In other words, $\Omega_T$ contains all matrix entries corresponding to endpoint marks of edges incident to $T$.
@@ -59,44 +55,27 @@ It reports four target-specific metrics:
 The mark-level true positives are defined as
 
 $$
-\mathrm{TP}_{\mathrm{mark}}
-=
-\sum_{(i,j)\in\Omega_T}
-\mathbb{I}
-\left[
-\widehat{\mathrm{PAG}}(i,j)\neq 0
-\ \land\
-\widehat{\mathrm{PAG}}(i,j)=\mathrm{PAG}(i,j)
-\right].
+\mathrm{TP}_{\mathrm{mark}} = \sum_{(i,j) \in \Omega_T} \mathbb{I}\left[\widehat{\mathrm{PAG}}(i,j) \neq 0 \land \widehat{\mathrm{PAG}}(i,j) = \mathrm{PAG}(i,j)\right].
 $$
 
 The metrics are then defined as
 
 $$
-\mathrm{Mark-Precision}
-=
-\frac{\mathrm{TP}_{\mathrm{mark}}}{\sum_{(i,j)\in\Omega_T}\mathbb{I}[\widehat{\mathrm{PAG}}(i,j)\neq 0]},
+\mathrm{Mark\mbox{-}Precision} = \frac{\mathrm{TP}_{\mathrm{mark}}}{\sum_{(i,j) \in \Omega_T} \mathbb{I}[\widehat{\mathrm{PAG}}(i,j) \neq 0]},
 $$
 
 $$
-\mathrm{Mark-Recall}
-=
-\frac{\mathrm{TP}_{\mathrm{mark}}}{\sum_{(i,j)\in\Omega_T}\mathbb{I}[\mathrm{PAG}(i,j)\neq 0]},
+\mathrm{Mark\mbox{-}Recall} = \frac{\mathrm{TP}_{\mathrm{mark}}}{\sum_{(i,j) \in \Omega_T} \mathbb{I}[\mathrm{PAG}(i,j) \neq 0]},
 $$
 
 $$
-\mathrm{Mark-F1}
-=
-\frac{2\cdot \mathrm{Mark-Precision}\cdot \mathrm{Mark-Recall}}{\mathrm{Mark-Precision}+\mathrm{Mark-Recall}},
+\mathrm{Mark\mbox{-}F1} = \frac{2 \cdot \mathrm{Mark\mbox{-}Precision} \cdot \mathrm{Mark\mbox{-}Recall}}{\mathrm{Mark\mbox{-}Precision} + \mathrm{Mark\mbox{-}Recall}},
 $$
 
 and
 
 $$
-\mathrm{Local-SHD}
-=
-\sum_{(i,j)\in\Omega_T}
-\mathbb{I}\left[\widehat{\mathrm{PAG}}(i,j)\neq \mathrm{PAG}(i,j)\right].
+\mathrm{Local\mbox{-}SHD} = \sum_{(i,j) \in \Omega_T} \mathbb{I}\left[\widehat{\mathrm{PAG}}(i,j) \neq \mathrm{PAG}(i,j)\right].
 $$
 
 This evaluation is strict: a predicted mark is counted as correct only if it is nonzero and exactly matches the ground-truth PAG mark. Higher mark-level scores and smaller `Local-SHD` indicate more accurate recovery of the target's local causal structure.
