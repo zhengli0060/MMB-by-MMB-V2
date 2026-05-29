@@ -83,6 +83,6 @@ This evaluation is strict: a predicted mark is counted as correct only if it is 
 
 ## 🤝 Contributing & Contact
 
-If you have questions or suggestions, feel free to open an issue or contact the author directly.
+If you have questions or suggestions, feel free to open an issue or pull request, or contact the author directly.
 
 Email: [zhengli0060(at)gmail(dot)com]
