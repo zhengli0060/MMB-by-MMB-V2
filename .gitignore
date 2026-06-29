@@ -5,3 +5,5 @@ dagtopag/.DS_Store
 dagtopag/dagtopag_utils/.DS_Store
 .DS_Store
 .vscode/settings.json
+*.pyc
+example.ipynb

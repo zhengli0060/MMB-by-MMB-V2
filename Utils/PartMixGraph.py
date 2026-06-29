@@ -829,8 +829,12 @@ class PartMixGraph:
         return results
 
     def get_all_uncovered_collider_paths_from_target(self, source: Node) -> List[List[Node]]:
+        max_path_length = 4
+        max_num_paths = 100
         results = []
         def dfs(path: List[Node], visited: Set[Node]):
+            if len(results) >= max_num_paths:
+                return   # Stop further exploration if we have enough paths
             current = path[-1]
             prev = path[-2]
             extended = False
@@ -839,10 +843,11 @@ class PartMixGraph:
                 if not self.has_into_edge(neighbor, current): continue
                 if neighbor in self._adj[prev]: continue
 
+                if len(path) + 1 > max_path_length: continue
+                
                 path.append(neighbor)
                 if len(path) >= 3 and list(path) not in results:
                     results.append(list(path))
-
                 if self.has_into_edge(current, neighbor):
                     visited.add(neighbor)
                     dfs(path, visited)
