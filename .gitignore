@@ -1,9 +1,4 @@
-example.ipynb
-generator/.DS_Store
-Utils/.DS_Store
-dagtopag/.DS_Store
-dagtopag/dagtopag_utils/.DS_Store
-.DS_Store
-.vscode/settings.json
-*.pyc
-example.ipynb
+/dagtopag/__pycache__
+/generator/__pycache__
+/Utils/__pycache__
+/__pycache__

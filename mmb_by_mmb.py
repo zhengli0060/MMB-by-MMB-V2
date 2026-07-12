@@ -31,13 +31,13 @@ def oracle_MMB_by_MMB(data:pd.DataFrame, target: str, latent_nodes: list[str]=[]
 
 
 
-def data_MMB_by_MMB(data:pd.DataFrame, target: str, ci_method: str="fisherz", mb_method: str="gaussian_MB", max_depth: int=100, alpha: float=0.01, **kwargs) -> PartMixGraph:
+def data_MMB_by_MMB(data:pd.DataFrame, target: str, ci_method: str="fisherz", mb_method: str="gaussian_MB", max_depth: int=100, alpha: float=0.01, max_K: int=3, **kwargs) -> PartMixGraph:
     """
     Data version of MMB-by-MMB algorithm, which uses the observed data and Fisher's Z test.
     """
     time_start = time.time()
     ci_test_obj = CI_test(data, method=ci_method, alpha=alpha, **kwargs)
-    local_learner = Local_Learner(data, target=target, ci_test_obj=ci_test_obj, version='data', mb_method=mb_method, max_K = 3)
+    local_learner = Local_Learner(data, target=target, ci_test_obj=ci_test_obj, version='data', mb_method=mb_method, max_K=max_K, whether_fast=kwargs.get("whether_fast", True))
     local_pag = local_learner.local_structure_learner(max_depth=max_depth)
     ci_num = local_learner.get_ci_test_number()
     time_end = time.time()
@@ -73,6 +73,7 @@ class Local_Learner:
             mb_method = kwargs.get("mb_method", None)
             assert mb_method is not None, "mb_method must be specified in kwargs, e.g., mb_method='gaussian_MB' for continuous data."
             mb_alpha = kwargs.get("mb_alpha", 1 / len(self.observed_vars)**2)  # Significance level for MB learning
+            self.whether_fast = kwargs.get("whether_fast", True)  # Whether to use the fast version of local structure learning, True means using the fast version, False means using the complete version.
             self.mb_learner = MB_learn(data, ci_test=self.ci_test, alpha=mb_alpha, mb_method_type=mb_method,**kwargs) 
         
         self.max_K = kwargs.get("max_K", len(self.observed_vars)-2)  # Maximum size of the separation set, default is 100
@@ -227,6 +228,8 @@ class Local_Learner:
             raise ValueError("Waitlist contains duplicate nodes, which should not happen.")
         return waitlist
 
+
+
     def oracle_local_learner(self, max_depth: int=10**18) -> PartMixGraph:
         
         waitlist = [self.target_Node]
@@ -285,7 +288,34 @@ class Local_Learner:
             sep_size += 1
 
         self.orient_collider(sub_graph, sepsets)
-        # self.orient_rules(sub_graph, sepsets)
+
+        if not self.whether_fast:
+            for x_node in sub_graph.Node_list:
+                pds_set_x = sub_graph.get_possible_d_sep(x_node, maxlength=self.max_K)
+                adj_list_x = list(sub_graph.get_adj_nodes(x_node))
+                for y_node in adj_list_x:
+                    if self.pag.has_edge(x_node, y_node):    # We can add some background knowledge here
+                        logger.info(f'skip {x_node} -- {y_node} because pag has this edge')
+                        continue
+                    sep_size = 0
+                    while sep_size <= self.max_K and (len(pds_set_x) - 1 >= sep_size):
+                        logger.info(f'Checking edge {x_node} -- {y_node} for sep_size={sep_size} in pds')
+                        pds_node_x_noy = pds_set_x - {y_node}
+                        pds_node_x_noy = set(node.name for node in pds_node_x_noy)
+                        for sepset in combinations(pds_node_x_noy, sep_size):
+                            """
+                            The CI test not accept the Node type, so we need to convert it to string.
+                            """
+                            if self.ci_test(x_node.name, y_node.name, list(sepset))[0]:
+                                sepsets.add_sepset(x_node, y_node, set(sepset))
+                                self.sepsets.add_sepset(x_node, y_node, set(sepset))
+                                sub_graph.remove_edge(x_node, y_node) #
+                                break
+                        if not sub_graph.has_edge(x_node, y_node):
+                            break  # Edge already removed, no need to check larger sep_size
+                        sep_size += 1        
+            sub_graph.clear_all_orientations()
+
 
         return sub_graph, sepsets
 

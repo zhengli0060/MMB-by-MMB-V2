@@ -726,7 +726,7 @@ class PartMixGraph:
     def max_pds_size(self) -> int:
         return max((len(self.get_possible_d_sep(node)) for node in self.Node_list), default=0)
 
-    def get_possible_d_sep(self, node: Node) -> Set[Node]:
+    def get_possible_d_sep(self, node: Node, maxlength: int= -1) -> Set[Node]:
         """
         Compute Possible-D-SEP(node):
         X_k ∈ pds(C, X_i, X_j) iff there exists a path π between X_i and X_k such that
@@ -741,6 +741,8 @@ class PartMixGraph:
             stack: List[List[Node]] = [[node, neigh]]
             while stack:
                 path = stack.pop()
+                if maxlength > 0 and len(path) > maxlength:
+                    continue
                 last = path[-1]
                 if last is not node:
                     results.add(last)
