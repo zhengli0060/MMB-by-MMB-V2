@@ -2,3 +2,6 @@
 /generator/__pycache__
 /Utils/__pycache__
 /__pycache__
+.DS_Store
+.vscode/settings.json
+*.pyc
